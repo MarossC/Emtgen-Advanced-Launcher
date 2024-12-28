@@ -36,5 +36,5 @@ powershell -Command ^
 echo Emtgen advanced launcher updated
 
 echo Starting Emtgen advanced launcher...
-start python main.py
+start /min python main.py
 echo Emtgen advanced launcher started

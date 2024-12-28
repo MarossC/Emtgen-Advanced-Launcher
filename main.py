@@ -1,4 +1,4 @@
-# import dependencies
+﻿# import dependencies
 import sys
 from os import path, kill, remove, listdir
 from win32api import EnumDisplayMonitors, GetMonitorInfo
@@ -114,8 +114,8 @@ class App(customtkinter.CTk):
         self.start_frame = customtkinter.CTkFrame(self, width=220, corner_radius=0)
         self.start_frame.grid(row=2, column=0, sticky="nsew")
         self.start_frame.columnconfigure(0, weight=1)
-        self.update_checkbox = customtkinter.CTkCheckBox(self.start_frame, text="Check for Update?", fg_color="green", hover_color="green")
-        self.update_checkbox.grid(row=0, column=0, sticky="w", padx=(10,0))
+#        self.update_checkbox = customtkinter.CTkCheckBox(self.start_frame, text="Check for Update?", fg_color="green", hover_color="green")
+#        self.update_checkbox.grid(row=0, column=0, sticky="w", padx=(10,0))
         self.start_button = customtkinter.CTkButton(self.start_frame, text="START", fg_color="green", hover_color="#006400", font=self.title_font, command=self.start)
         self.start_button.grid(row=1, column=0, sticky="nsew", padx=(10,25), pady=10)
 
@@ -711,11 +711,11 @@ class App(customtkinter.CTk):
             return
         
         # check if patcher exists
-        if self.update_checkbox.get() == 1:
-            if not path.exists(update_path):
-                CTkMessagebox(master=self, title="Warning Message!", message=f"Cannot find Emtgen2_Patcher.exe, please rename your launcher", icon="warning")
-                self.start_button.configure(state="normal")
-                return
+#        if self.update_checkbox.get() == 1:
+#            if not path.exists(update_path):
+#                CTkMessagebox(master=self, title="Warning Message!", message=f"Cannot find Emtgen2_Patcher.exe, please rename your launcher", icon="warning")
+#                self.start_button.configure(state="normal")
+#                return
 
         # check if fullscreen is on its own
         fs = any(d[1]['fullscreen'] == 1 and d[1]['state'] == 1 for d in self.settings)
@@ -856,34 +856,34 @@ class App(customtkinter.CTk):
                             y = 0
                         windows_to_start.append({"x":x,"y":y,"config":combine_values(window[1]),"fullscreen":window[1]["fullscreen"]})
 
-            if self.update_checkbox.get() == 1:
-                uphwnds = []
-                def updateEnumHandler(uphwnd, ctx):
-                    if IsWindowVisible(uphwnd):
-                        _, process_id = GetWindowThreadProcessId(uphwnd)
-                        if process_id == ctx:
-                            ShowWindow(uphwnd, SW_HIDE)
-                            uphwnds.append(uphwnd)
-
-                process = Popen([update_path],cwd=path.join(directory, emtgenpath))
-                pidd = process.pid
-                p = Process(pidd)
-                while True:
-                    EnumWindows(updateEnumHandler, pidd)
-                    if len(uphwnds) > 0:
-                        break
-
-                while True:
-                    io_counters = p.io_counters() 
-                    read = io_counters[2]
-                    write = io_counters[3]
-                    sleep(10)
-                    io_counters_new = p.io_counters() 
-                    read_new = io_counters_new[2]
-                    write_new = io_counters_new[3]
-                    if read == read_new and write == write_new:
-                        kill(pidd,15)
-                        break
+#            if self.update_checkbox.get() == 1:
+#                uphwnds = []
+#                def updateEnumHandler(uphwnd, ctx):
+#                    if IsWindowVisible(uphwnd):
+#                        _, process_id = GetWindowThreadProcessId(uphwnd)
+#                        if process_id == ctx:
+#                            ShowWindow(uphwnd, SW_HIDE)
+#                            uphwnds.append(uphwnd)
+#
+#                process = Popen([update_path],cwd=path.join(directory, emtgenpath))
+#                pidd = process.pid
+#                p = Process(pidd)
+#                while True:
+#                    EnumWindows(updateEnumHandler, pidd)
+#                    if len(uphwnds) > 0:
+#                        break
+#
+#                while True:
+#                    io_counters = p.io_counters() 
+#                    read = io_counters[2]
+#                    write = io_counters[3]
+#                    sleep(10)
+#                    io_counters_new = p.io_counters() 
+#                    read_new = io_counters_new[2]
+#                    write_new = io_counters_new[3]
+#                    if read == read_new and write == write_new:
+#                        kill(pidd,15)
+#                        break
 
             key_lines = []
             if path.exists(config_path): 
@@ -964,7 +964,7 @@ class App(customtkinter.CTk):
 
             # set settings to loaded values
             self.scale_optionmenu.set(settings["scale"])
-            self.update_checkbox.select() if settings["update"] == 1 else self.update_checkbox.deselect()
+#            self.update_checkbox.select() if settings["update"] == 1 else self.update_checkbox.deselect()
             self.defaults = settings["defaults"]
 
             if dictionaries != []:
@@ -995,7 +995,7 @@ class App(customtkinter.CTk):
         dictionaries = [dictionary for _, dictionary in self.settings]
 
         # construct settings section
-        setting = {"scale": self.scale_optionmenu.get(), "update": self.update_checkbox.get(), "defaults": self.defaults}
+        setting = {"scale": self.scale_optionmenu.get(), "defaults": self.defaults}#, "update": self.update_checkbox.get()}
 
         # combine
         to_save = {"windows": dictionaries, "settings": setting}
