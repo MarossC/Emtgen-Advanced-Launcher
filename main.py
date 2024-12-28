@@ -1,4 +1,4 @@
-﻿# import dependencies
+# import dependencies
 import sys
 from os import path, kill, remove, listdir
 from win32api import EnumDisplayMonitors, GetMonitorInfo
@@ -1012,3 +1012,4 @@ class App(customtkinter.CTk):
 if __name__ == "__main__":
     app = App()
     app.mainloop()
+
