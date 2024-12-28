@@ -23,18 +23,19 @@ powershell -Command ^
   "& pip install $lib"
 echo Dependencies checked
 
-echo Updating stellaria advanced launcher...
-powershell -Command ^
-  "$apiUrl = 'https://api.github.com/repos/Smety2001/Stellaria-Advanced-Launcher/contents/main.py?ref=main';" ^
-  "$timestamp = Get-Date -Format 'yyyyMMddHHmmss';" ^
-  "$uniqueUrl = $apiUrl + '&timestamp=' + $timestamp;" ^
-  "$headers = @{ 'Cache-Control' = 'no-cache' };" ^
-  "$response = Invoke-RestMethod -Uri $uniqueUrl -Headers $headers;" ^
-  "$content = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($response.content));" ^
-  "$filePath = '%~dp0' + $response.name;" ^
-  "Set-Content -Path $filePath -Value $content -Encoding utf8"
-echo Stellaria advanced launcher updated
+rem echo Updating stellaria advanced launcher...
+rem powershell -Command ^
+rem   "$apiUrl = 'https://api.github.com/repos/Smety2001/Stellaria-Advanced-Launcher/contents/main.py?ref=main';" ^
+rem   "$timestamp = Get-Date -Format 'yyyyMMddHHmmss';" ^
+rem   "$uniqueUrl = $apiUrl + '&timestamp=' + $timestamp;" ^
+rem   "$headers = @{ 'Cache-Control' = 'no-cache' };" ^
+rem   "$response = Invoke-RestMethod -Uri $uniqueUrl -Headers $headers;" ^
+rem   "$content = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($response.content));" ^
+rem   "$filePath = '%~dp0' + $response.name;" ^
+rem   "Set-Content -Path $filePath -Value $content -Encoding utf8"
+rem echo Stellaria advanced launcher updated
 
 echo Starting stellaria advanced launcher...
-start /min python main.py
+start python main.py
 echo Stellaria advanced launcher started
+pause

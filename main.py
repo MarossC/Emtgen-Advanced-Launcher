@@ -1,6 +1,6 @@
 # import dependencies
 import sys
-from os import path, kill, remove
+from os import path, kill, remove, listdir
 from win32api import EnumDisplayMonitors, GetMonitorInfo
 from win32gui import IsWindowVisible, ShowWindow, EnumWindows, GetWindowRect, MoveWindow
 from win32con import SW_HIDE
@@ -15,6 +15,18 @@ import customtkinter
 from CTkMessagebox import CTkMessagebox
 from pynput.mouse import Controller
 from json import dump, load
+import re
+
+def is_admin():
+    return windll.shell32.IsUserAnAdmin() == 1
+
+if not is_admin():
+    windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, None)
+    exit()
+
+for listdiritem in listdir("."):
+    if re.match(r'emt',listdiritem,flags=re.IGNORECASE):
+        emtgenpath = listdiritem
 
 # close splash screen and set directory
 if getattr(sys, "frozen", False):
@@ -27,10 +39,9 @@ else:
 
 # setup paths
 save_path = path.join(directory, "advanced_settings.json")
-exe_path = path.join(directory, "start.exe")
-update_path = path.join(directory, ".Stellaria-launcher.exe")
-config_path = path.join(directory, "settings.cfg")
-crash_path = path.join(directory, "CrashSender1500.exe")
+exe_path = path.join(directory, emtgenpath, "client.exe")
+update_path = path.join(directory, emtgenpath, "Emtgen2_Patcher.exe")
+config_path = path.join(directory, emtgenpath, "config.cfg")
 
 # set to previously set scale if exists
 if path.exists(save_path):
@@ -41,9 +52,21 @@ if path.exists(save_path):
         customtkinter.set_widget_scaling(scale)
         customtkinter.set_window_scaling(scale)
 
+
+
+if path.exists(config_path):
+    cfg_file = open(config_path, 'r')
+    cfg_lines = cfg_file.readlines()
+    clean_cfg_lines = []
+    for cfg_line in cfg_lines:
+        cfg_line_first = re.sub(r'\t{1,}',' ',cfg_line)
+        cfg_line_second = re.sub(r'\n{1,}','',cfg_line_first)
+        if not (cfg_line_second == ""):
+            clean_cfg_lines.append(cfg_line_second) 
+
 # set app theme
 customtkinter.set_appearance_mode("Dark")
-customtkinter.set_default_color_theme("blue")
+customtkinter.set_default_color_theme(".\\red.json")
 
 # main GUI app
 class App(customtkinter.CTk):
@@ -51,7 +74,7 @@ class App(customtkinter.CTk):
         super().__init__()
 
         # configure window
-        self.title("Stellaria Advanced Launcher")
+        self.title("Emtgen Advanced Launcher")
         if path.exists(update_path):
             self.wm_iconbitmap(update_path)
 
@@ -116,28 +139,28 @@ class App(customtkinter.CTk):
         self.tabview.grid(row=1, column=1, rowspan=2, padx=20, pady=(0,20), sticky="nsew")
         self.tabview.add("Video")
         self.tabview.add("Audio")
-        self.tabview.add("Effects")
-        self.tabview.add("Combat")
-        self.tabview.add("Functional")
+#        self.tabview.add("Effects")
+#        self.tabview.add("Combat")
+#        self.tabview.add("Functional")
 
         self.tabview.tab("Video").grid_columnconfigure(1, weight=1)
         self.tabview.tab("Audio").grid_columnconfigure(2, weight=1)
-        self.tabview.tab("Effects").grid_columnconfigure(2, weight=1)
-        self.tabview.tab("Combat").grid_columnconfigure(0, weight=1)
-        self.tabview.tab("Functional").grid_columnconfigure(0, weight=1)
+#        self.tabview.tab("Effects").grid_columnconfigure(2, weight=1)
+#        self.tabview.tab("Combat").grid_columnconfigure(0, weight=1)
+#        self.tabview.tab("Functional").grid_columnconfigure(0, weight=1)
 
         ### VIDEO TAB ###
         self.video_label = customtkinter.CTkLabel(self.tabview.tab("Video"), text="Video", font=self.title_font)
         self.video_label.grid(row=0, column=0, sticky="nw", padx=2, pady=2)
 
-        # validation for fps field
-        fps_validation = (self.register(self.fps_val), "%P")
+#        # validation for fps field
+#        fps_validation = (self.register(self.fps_val), "%P")
 
-        # fps
-        self.fps_label = customtkinter.CTkLabel(self.tabview.tab("Video"), text="Max FPS (1-360)", font=self.label_font)
-        self.fps_label.grid(row=1, column=0, sticky="nw", padx=(2,32), pady=2)
-        self.fps_entry = customtkinter.CTkEntry(self.tabview.tab("Video"), validate="key", validatecommand=fps_validation)
-        self.fps_entry.grid(row=1, column=1, sticky="nw", padx=2, pady=2)
+#        # fps
+#        self.fps_label = customtkinter.CTkLabel(self.tabview.tab("Video"), text="Max FPS (1-360)", font=self.label_font)
+#        self.fps_label.grid(row=1, column=0, sticky="nw", padx=(2,32), pady=2)
+#        self.fps_entry = customtkinter.CTkEntry(self.tabview.tab("Video"), validate="key", validatecommand=fps_validation)
+#        self.fps_entry.grid(row=1, column=1, sticky="nw", padx=2, pady=2)
 
         self.fullscreen_var = customtkinter.IntVar()
 
@@ -204,113 +227,113 @@ class App(customtkinter.CTk):
         self.bgm_number_label = customtkinter.CTkLabel(self.tabview.tab("Audio"), textvariable=self.bgm_number_str, font=self.label_font)
         self.bgm_number_label.grid(row=2, column=2, sticky="nw", padx=2, pady=2)
 
-        ### EFFECTS TAB ###
-        self.effects_label = customtkinter.CTkLabel(self.tabview.tab("Effects"), text="Effects", font=self.title_font)
-        self.effects_label.grid(row=0, column=0, sticky="nw", padx=2, pady=2)
+#        ### EFFECTS TAB ###
+#        self.effects_label = customtkinter.CTkLabel(self.tabview.tab("Effects"), text="Effects", font=self.title_font)
+#        self.effects_label.grid(row=0, column=0, sticky="nw", padx=2, pady=2)
+#
+#        # effects
+#        self.effects_switch = customtkinter.CTkSwitch(self.tabview.tab("Effects"), text="Show Effects")
+#        self.effects_switch.grid(row=1, column=0, sticky="nw", padx=2, pady=2,)
+#
+#        # names
+#        self.names_switch = customtkinter.CTkSwitch(self.tabview.tab("Effects"), text="Show Names")
+#        self.names_switch.grid(row=2, column=0, sticky="nw", padx=2, pady=2)
+#
+#        # chat
+#        self.chat_switch = customtkinter.CTkSwitch(self.tabview.tab("Effects"), text="Show Chat")
+#        self.chat_switch.grid(row=3, column=0, sticky="nw", padx=2, pady=2)
+#
+#        # glow + glitter
+#        self.glow_switch = customtkinter.CTkSwitch(self.tabview.tab("Effects"), text="Show Glow + Glitter")
+#        self.glow_switch.grid(row=4, column=0, sticky="nw", padx=2, pady=2)
+#
+#        # model preview
+#        self.model_switch = customtkinter.CTkSwitch(self.tabview.tab("Effects"), text="Show Model Preview")
+#        self.model_switch.grid(row=5, column=0, sticky="nw", padx=2, pady=2)
+#
+#        # metin2 cursor
+#        self.cursor_switch = customtkinter.CTkSwitch(self.tabview.tab("Effects"), text="Use Stellaria Cursor")
+#        self.cursor_switch.grid(row=6, column=0, sticky="nw", padx=2, pady=2)
+#
+#        # fov
+#        self.fov_label = customtkinter.CTkLabel(self.tabview.tab("Effects"), text="FOV", font=self.label_font)
+#        self.fov_label.grid(row=7, column=0, sticky="nw", padx=2, pady=2)
+#        self.fov_number = customtkinter.IntVar(value=0)
+#        self.fov_slider = customtkinter.CTkSlider(self.tabview.tab("Effects"), from_=0, to=90, number_of_steps=90, command=self.set_fov)
+#        self.fov_slider.grid(row=7, column=1, sticky="ew", padx=2, pady=2)
+#        self.fov_number_label = customtkinter.CTkLabel(self.tabview.tab("Effects"), textvariable=self.fov_number, font=self.label_font)
+#        self.fov_number_label.grid(row=7, column=2, sticky="nw", padx=2, pady=2)
+#
+#        # transparent
+#        self.transparent_label = customtkinter.CTkLabel(self.tabview.tab("Effects"), text="Transparency", font=self.label_font)
+#        self.transparent_label.grid(row=8, column=0, sticky="nw", padx=2, pady=2)
+#        self.transparent_number = customtkinter.DoubleVar()
+#        self.transparent_number_str = customtkinter.StringVar()
+#        self.transparent_number.trace_add("write", self.update_transparent_number_str)
+#        self.transparent_slider = customtkinter.CTkSlider(self.tabview.tab("Effects"), from_=0, to=1, number_of_steps=20, command=self.set_transparent)
+#        self.transparent_slider.grid(row=8, column=1, sticky="ew", padx=2, pady=2)
+#        self.transparent_number_label = customtkinter.CTkLabel(self.tabview.tab("Effects"), textvariable=self.transparent_number_str, font=self.label_font)
+#        self.transparent_number_label.grid(row=8, column=2, sticky="nw", padx=2, pady=2)
+#
+#        # shadows
+#        self.shadow_label = customtkinter.CTkLabel(self.tabview.tab("Effects"), text="Shadows", font=self.label_font)
+#        self.shadow_label.grid(row=9, column=0, sticky="nw", padx=2, pady=2)
+#        self.shadow_options = ["None", "Background", "Background + Player", "All - low", "All - Medium", "All - High"]
+#        self.shadow_optionmenu = customtkinter.CTkOptionMenu(self.tabview.tab("Effects"), width=175, values=self.shadow_options)
+#        self.shadow_optionmenu.grid(row=9, column=1, sticky="nw", padx=2, pady=2)
+#
+#        # skybox
+#        self.skybox_label = customtkinter.CTkLabel(self.tabview.tab("Effects"), text="Skybox", font=self.label_font)
+#        self.skybox_label.grid(row=10, column=0, sticky="nw", padx=2, pady=2)
+#        self.skybox_options = ["Auto", "1", "2", "3", "4", "5", "6", "7", "8", "Original"]
+#        self.skybox_optionmenu = customtkinter.CTkOptionMenu(self.tabview.tab("Effects"), width=175, values=self.skybox_options)
+#        self.skybox_optionmenu.grid(row=10, column=1, sticky="nw", padx=2, pady=2)
 
-        # effects
-        self.effects_switch = customtkinter.CTkSwitch(self.tabview.tab("Effects"), text="Show Effects")
-        self.effects_switch.grid(row=1, column=0, sticky="nw", padx=2, pady=2,)
+#        ### COMBAT TAB ###
+#        self.combat_label = customtkinter.CTkLabel(self.tabview.tab("Combat"), text="Combat", font=self.title_font)
+#        self.combat_label.grid(row=0, column=0, sticky="nw", padx=2, pady=2)
+#
+#        # pet skill used in chat
+#        self.petskill_switch = customtkinter.CTkSwitch(self.tabview.tab("Combat"), text="Show Pet's Skill Message")
+#        self.petskill_switch.grid(row=1, column=0, sticky="nw", padx=2, pady=2)
+#
+#        self.monsters_label = customtkinter.CTkLabel(self.tabview.tab("Combat"), text="Monsters", font=self.subtitle_font)
+#        self.monsters_label.grid(row=2, column=0, sticky="nw", padx=2, pady=2)
+#
+#        # dogmode
+#        self.dogmode_switch = customtkinter.CTkSwitch(self.tabview.tab("Combat"), text="Use Dog-mode")
+#        self.dogmode_switch.grid(row=3, column=0, sticky="nw", padx=2, pady=2)
+#
+#        # mob level
+#        self.moblvl_switch = customtkinter.CTkSwitch(self.tabview.tab("Combat"), text="Show Monster's Level")
+#        self.moblvl_switch.grid(row=4, column=0, sticky="nw", padx=2, pady=2)
+#
+#        # aggresive mob indicator
+#        self.agromob_switch = customtkinter.CTkSwitch(self.tabview.tab("Combat"), text="Show Aggresive Indicator (*)")
+#        self.agromob_switch.grid(row=5, column=0, sticky="nw", padx=2, pady=2)
+#
+#        self.damage_label = customtkinter.CTkLabel(self.tabview.tab("Combat"), text="Damage", font=self.subtitle_font)
+#        self.damage_label.grid(row=6, column=0, sticky="nw", padx=2, pady=2)
+#
+#        # damage
+#        self.damage_switch = customtkinter.CTkSwitch(self.tabview.tab("Combat"), text="Show Damage")
+#        self.damage_switch.grid(row=7, column=0, sticky="nw", padx=2, pady=2,)
+#
+#        # multiple targets damage
+#        self.multidmg_switch = customtkinter.CTkSwitch(self.tabview.tab("Combat"), text="Show Multi-target Damage")
+#        self.multidmg_switch.grid(row=8, column=0, sticky="nw", padx=2, pady=2)
 
-        # names
-        self.names_switch = customtkinter.CTkSwitch(self.tabview.tab("Effects"), text="Show Names")
-        self.names_switch.grid(row=2, column=0, sticky="nw", padx=2, pady=2)
-
-        # chat
-        self.chat_switch = customtkinter.CTkSwitch(self.tabview.tab("Effects"), text="Show Chat")
-        self.chat_switch.grid(row=3, column=0, sticky="nw", padx=2, pady=2)
-
-        # glow + glitter
-        self.glow_switch = customtkinter.CTkSwitch(self.tabview.tab("Effects"), text="Show Glow + Glitter")
-        self.glow_switch.grid(row=4, column=0, sticky="nw", padx=2, pady=2)
-
-        # model preview
-        self.model_switch = customtkinter.CTkSwitch(self.tabview.tab("Effects"), text="Show Model Preview")
-        self.model_switch.grid(row=5, column=0, sticky="nw", padx=2, pady=2)
-
-        # metin2 cursor
-        self.cursor_switch = customtkinter.CTkSwitch(self.tabview.tab("Effects"), text="Use Stellaria Cursor")
-        self.cursor_switch.grid(row=6, column=0, sticky="nw", padx=2, pady=2)
-
-        # fov
-        self.fov_label = customtkinter.CTkLabel(self.tabview.tab("Effects"), text="FOV", font=self.label_font)
-        self.fov_label.grid(row=7, column=0, sticky="nw", padx=2, pady=2)
-        self.fov_number = customtkinter.IntVar(value=0)
-        self.fov_slider = customtkinter.CTkSlider(self.tabview.tab("Effects"), from_=0, to=90, number_of_steps=90, command=self.set_fov)
-        self.fov_slider.grid(row=7, column=1, sticky="ew", padx=2, pady=2)
-        self.fov_number_label = customtkinter.CTkLabel(self.tabview.tab("Effects"), textvariable=self.fov_number, font=self.label_font)
-        self.fov_number_label.grid(row=7, column=2, sticky="nw", padx=2, pady=2)
-
-        # transparent
-        self.transparent_label = customtkinter.CTkLabel(self.tabview.tab("Effects"), text="Transparency", font=self.label_font)
-        self.transparent_label.grid(row=8, column=0, sticky="nw", padx=2, pady=2)
-        self.transparent_number = customtkinter.DoubleVar()
-        self.transparent_number_str = customtkinter.StringVar()
-        self.transparent_number.trace_add("write", self.update_transparent_number_str)
-        self.transparent_slider = customtkinter.CTkSlider(self.tabview.tab("Effects"), from_=0, to=1, number_of_steps=20, command=self.set_transparent)
-        self.transparent_slider.grid(row=8, column=1, sticky="ew", padx=2, pady=2)
-        self.transparent_number_label = customtkinter.CTkLabel(self.tabview.tab("Effects"), textvariable=self.transparent_number_str, font=self.label_font)
-        self.transparent_number_label.grid(row=8, column=2, sticky="nw", padx=2, pady=2)
-
-        # shadows
-        self.shadow_label = customtkinter.CTkLabel(self.tabview.tab("Effects"), text="Shadows", font=self.label_font)
-        self.shadow_label.grid(row=9, column=0, sticky="nw", padx=2, pady=2)
-        self.shadow_options = ["None", "Background", "Background + Player", "All - low", "All - Medium", "All - High"]
-        self.shadow_optionmenu = customtkinter.CTkOptionMenu(self.tabview.tab("Effects"), width=175, values=self.shadow_options)
-        self.shadow_optionmenu.grid(row=9, column=1, sticky="nw", padx=2, pady=2)
-
-        # skybox
-        self.skybox_label = customtkinter.CTkLabel(self.tabview.tab("Effects"), text="Skybox", font=self.label_font)
-        self.skybox_label.grid(row=10, column=0, sticky="nw", padx=2, pady=2)
-        self.skybox_options = ["Auto", "1", "2", "3", "4", "5", "6", "7", "8", "Original"]
-        self.skybox_optionmenu = customtkinter.CTkOptionMenu(self.tabview.tab("Effects"), width=175, values=self.skybox_options)
-        self.skybox_optionmenu.grid(row=10, column=1, sticky="nw", padx=2, pady=2)
-
-        ### COMBAT TAB ###
-        self.combat_label = customtkinter.CTkLabel(self.tabview.tab("Combat"), text="Combat", font=self.title_font)
-        self.combat_label.grid(row=0, column=0, sticky="nw", padx=2, pady=2)
-
-        # pet skill used in chat
-        self.petskill_switch = customtkinter.CTkSwitch(self.tabview.tab("Combat"), text="Show Pet's Skill Message")
-        self.petskill_switch.grid(row=1, column=0, sticky="nw", padx=2, pady=2)
-
-        self.monsters_label = customtkinter.CTkLabel(self.tabview.tab("Combat"), text="Monsters", font=self.subtitle_font)
-        self.monsters_label.grid(row=2, column=0, sticky="nw", padx=2, pady=2)
-
-        # dogmode
-        self.dogmode_switch = customtkinter.CTkSwitch(self.tabview.tab("Combat"), text="Use Dog-mode")
-        self.dogmode_switch.grid(row=3, column=0, sticky="nw", padx=2, pady=2)
-
-        # mob level
-        self.moblvl_switch = customtkinter.CTkSwitch(self.tabview.tab("Combat"), text="Show Monster's Level")
-        self.moblvl_switch.grid(row=4, column=0, sticky="nw", padx=2, pady=2)
-
-        # aggresive mob indicator
-        self.agromob_switch = customtkinter.CTkSwitch(self.tabview.tab("Combat"), text="Show Aggresive Indicator (*)")
-        self.agromob_switch.grid(row=5, column=0, sticky="nw", padx=2, pady=2)
-
-        self.damage_label = customtkinter.CTkLabel(self.tabview.tab("Combat"), text="Damage", font=self.subtitle_font)
-        self.damage_label.grid(row=6, column=0, sticky="nw", padx=2, pady=2)
-
-        # damage
-        self.damage_switch = customtkinter.CTkSwitch(self.tabview.tab("Combat"), text="Show Damage")
-        self.damage_switch.grid(row=7, column=0, sticky="nw", padx=2, pady=2,)
-
-        # multiple targets damage
-        self.multidmg_switch = customtkinter.CTkSwitch(self.tabview.tab("Combat"), text="Show Multi-target Damage")
-        self.multidmg_switch.grid(row=8, column=0, sticky="nw", padx=2, pady=2)
-
-        ### FUNCTIONAL TAB ###
-        self.functional_label = customtkinter.CTkLabel(self.tabview.tab("Functional"), text="Functional", font=self.title_font)
-        self.functional_label.grid(row=0, column=0, sticky="nw", padx=2, pady=2)
-
-        # IME
-        self.ime_switch = customtkinter.CTkSwitch(self.tabview.tab("Functional"), text="Use Stellaria IME")
-        self.ime_switch.grid(row=1, column=0, sticky="nw", padx=2, pady=2,)
-
-        # pickup
-        self.pickup_switch = customtkinter.CTkSwitch(self.tabview.tab("Functional"), text="Pickup Everything")
-        self.pickup_switch.grid(row=2, column=0, sticky="nw", padx=2, pady=2)
+#        ### FUNCTIONAL TAB ###
+#        self.functional_label = customtkinter.CTkLabel(self.tabview.tab("Functional"), text="Functional", font=self.title_font)
+#        self.functional_label.grid(row=0, column=0, sticky="nw", padx=2, pady=2)
+#
+#        # IME
+#        self.ime_switch = customtkinter.CTkSwitch(self.tabview.tab("Functional"), text="Use Stellaria IME")
+#        self.ime_switch.grid(row=1, column=0, sticky="nw", padx=2, pady=2,)
+#
+#        # pickup
+#        self.pickup_switch = customtkinter.CTkSwitch(self.tabview.tab("Functional"), text="Pickup Everything")
+#        self.pickup_switch.grid(row=2, column=0, sticky="nw", padx=2, pady=2)
 
         # prepare loading screen
         self.loading = customtkinter.CTkLabel(self, text="Starting... Please Wait", font=customtkinter.CTkFont(size=50))
@@ -379,33 +402,33 @@ class App(customtkinter.CTk):
         self.height_start_entry.insert(0, str(values["ystart"]))
         self.height_end_entry.delete(0, customtkinter.END)
         self.height_end_entry.insert(0, str(values["yend"]))
-        self.fps_entry.delete(0, customtkinter.END)
-        self.fps_entry.insert(0, str(values["fps"]))
+#        self.fps_entry.delete(0, customtkinter.END)
+#        self.fps_entry.insert(0, str(values["fps"]))
         self.fullscreen_switch.select() if values["fullscreen"] == 1 else self.fullscreen_switch.deselect()
         self.sfx_slider.set(values["sfx"])
         self.sfx_number.set(values["sfx"])
         self.bgm_slider.set(values["bgm"])
         self.bgm_number.set(values["bgm"])
-        self.effects_switch.select() if values["effects"] == 1 else self.effects_switch.deselect()
-        self.names_switch.select() if values["names"] == 1 else self.names_switch.deselect()
-        self.chat_switch.select() if values["chat"] == 1 else self.chat_switch.deselect()
-        self.glow_switch.select() if values["glow"] == 1 else self.glow_switch.deselect()  
-        self.model_switch.select() if values["model"] == 1 else self.model_switch.deselect()  
-        self.cursor_switch.select() if values["cursor"] == 1 else self.cursor_switch.deselect() 
-        self.fov_slider.set(values["fov"])
-        self.fov_number.set(values["fov"])
-        self.transparent_slider.set(values["transparency"])
-        self.transparent_number.set(values["transparency"])
-        self.shadow_optionmenu.set(self.shadow_options[values["shadow"]])
-        self.skybox_optionmenu.set(self.skybox_options[values["skybox"]])
-        self.petskill_switch.select() if values["petskill"] == 1 else self.petskill_switch.deselect()
-        self.dogmode_switch.select() if values["dogmode"] == 1 else self.dogmode_switch.deselect()
-        self.moblvl_switch.select() if values["moblvl"] == 1 else self.moblvl_switch.deselect()
-        self.agromob_switch.select() if values["agromob"] == 1 else self.agromob_switch.deselect()
-        self.damage_switch.select() if values["damage"] == 1 else self.damage_switch.deselect()       
-        self.multidmg_switch.select() if values["multidmg"] == 1 else self.multidmg_switch.deselect()
-        self.ime_switch.select() if values["ime"] == 1 else self.ime_switch.deselect()
-        self.pickup_switch.select() if values["pickup"] == 1 else self.pickup_switch.deselect()
+#        self.effects_switch.select() if values["effects"] == 1 else self.effects_switch.deselect()
+#        self.names_switch.select() if values["names"] == 1 else self.names_switch.deselect()
+#        self.chat_switch.select() if values["chat"] == 1 else self.chat_switch.deselect()
+#        self.glow_switch.select() if values["glow"] == 1 else self.glow_switch.deselect()  
+#        self.model_switch.select() if values["model"] == 1 else self.model_switch.deselect()  
+#        self.cursor_switch.select() if values["cursor"] == 1 else self.cursor_switch.deselect() 
+#        self.fov_slider.set(values["fov"])
+#        self.fov_number.set(values["fov"])
+#        self.transparent_slider.set(values["transparency"])
+#        self.transparent_number.set(values["transparency"])
+#        self.shadow_optionmenu.set(self.shadow_options[values["shadow"]])
+#        self.skybox_optionmenu.set(self.skybox_options[values["skybox"]])
+#        self.petskill_switch.select() if values["petskill"] == 1 else self.petskill_switch.deselect()
+#        self.dogmode_switch.select() if values["dogmode"] == 1 else self.dogmode_switch.deselect()
+#        self.moblvl_switch.select() if values["moblvl"] == 1 else self.moblvl_switch.deselect()
+#        self.agromob_switch.select() if values["agromob"] == 1 else self.agromob_switch.deselect()
+#        self.damage_switch.select() if values["damage"] == 1 else self.damage_switch.deselect()       
+#        self.multidmg_switch.select() if values["multidmg"] == 1 else self.multidmg_switch.deselect()
+#        self.ime_switch.select() if values["ime"] == 1 else self.ime_switch.deselect()
+#        self.pickup_switch.select() if values["pickup"] == 1 else self.pickup_switch.deselect()
         self.display_optionmenu.set(values["display"])
         self.fullscreen_optionmenu.set(values["fullscreenres"])
     def get_values(self):
@@ -413,28 +436,28 @@ class App(customtkinter.CTk):
                   "xend": int(self.width_end_entry.get()),
                   "ystart": int(self.height_start_entry.get()),
                   "yend": int(self.height_end_entry.get()),
-                  "fps": int(self.fps_entry.get()),
+#                  "fps": int(self.fps_entry.get()),
                   "fullscreen": self.fullscreen_switch.get(),
                   "sfx": self.sfx_number.get(),
                   "bgm": self.bgm_number.get(),
-                  "effects": self.effects_switch.get(),
-                  "names": self.names_switch.get(),
-                  "chat": self.chat_switch.get(),
-                  "glow": self.glow_switch.get(),
-                  "model": self.model_switch.get(),
-                  "cursor": self.cursor_switch.get(),
-                  "fov": self.fov_number.get(),
-                  "transparency": self.transparent_number.get(),
-                  "shadow": self.shadow_options.index(self.shadow_optionmenu.get()),
-                  "skybox": self.skybox_options.index(self.skybox_optionmenu.get()),
-                  "petskill": self.petskill_switch.get(),
-                  "dogmode": self.dogmode_switch.get(),
-                  "moblvl": self.moblvl_switch.get(),
-                  "agromob": self.agromob_switch.get(),
-                  "damage": self.damage_switch.get(),
-                  "multidmg": self.multidmg_switch.get(),
-                  "ime": self.ime_switch.get(),
-                  "pickup": self.pickup_switch.get(),
+#                  "effects": self.effects_switch.get(),
+#                  "names": self.names_switch.get(),
+#                  "chat": self.chat_switch.get(),
+#                  "glow": self.glow_switch.get(),
+#                  "model": self.model_switch.get(),
+#                  "cursor": self.cursor_switch.get(),
+#                  "fov": self.fov_number.get(),
+#                  "transparency": self.transparent_number.get(),
+#                  "shadow": self.shadow_options.index(self.shadow_optionmenu.get()),
+#                  "skybox": self.skybox_options.index(self.skybox_optionmenu.get()),
+#                  "petskill": self.petskill_switch.get(),
+#                  "dogmode": self.dogmode_switch.get(),
+#                  "moblvl": self.moblvl_switch.get(),
+#                  "agromob": self.agromob_switch.get(),
+#                  "damage": self.damage_switch.get(),
+#                  "multidmg": self.multidmg_switch.get(),
+#                  "ime": self.ime_switch.get(),
+#                  "pickup": self.pickup_switch.get(),
                   "display": self.display_optionmenu.get(),
                   "fullscreenres": self.fullscreen_optionmenu.get()}
         return values
@@ -518,10 +541,10 @@ class App(customtkinter.CTk):
         # set the pressed window to current
         for button in self.buttons:
             if button[0] == b_id:
-                button[1].configure(fg_color=["#325882", "#14375e"])
+                button[1].configure(fg_color=["#800000", "#800000"])
                 self.current_window = button[0]
             else:
-                button[1].configure(fg_color=["#3B8ED0", "#1F6AA5"])
+                button[1].configure(fg_color=["#C08261", "#C08261"])
                 
         # show values for current window
         for list in self.settings:
@@ -690,7 +713,7 @@ class App(customtkinter.CTk):
         # check if patcher exists
         if self.update_checkbox.get() == 1:
             if not path.exists(update_path):
-                CTkMessagebox(master=self, title="Warning Message!", message=f"Cannot find .Stellaria-launcher.exe, please rename your launcher", icon="warning")
+                CTkMessagebox(master=self, title="Warning Message!", message=f"Cannot find Emtgen2_Patcher.exe, please rename your launcher", icon="warning")
                 self.start_button.configure(state="normal")
                 return
 
@@ -736,7 +759,7 @@ class App(customtkinter.CTk):
                         self.start_button.configure(state="normal")
                         return
 
-        def open_stellaria():
+        def open_emtgen():
             windll.user32.SetThreadDpiAwarenessContext(c_void_p(-1))
 
             minfo = []
@@ -760,41 +783,62 @@ class App(customtkinter.CTk):
                     width = ceil(((abs(int(values["xend"])-int(values["xstart"]))) / 100) * (work_area[2] - work_area[0]))
                     height = ceil((((abs(int(values["yend"])-int(values["ystart"]))) / 100) * (work_area[3] - work_area[1])) - windll.user32.GetSystemMetrics(4) - 8)
 
+                settings = []
+                for clean_cfg_line in clean_cfg_lines:
+                    if re.match("WIDTH",clean_cfg_line):
+                        clean_cfg_line = "WIDTH " + str(width)
+                    
+                    if re.match("HEIGHT",clean_cfg_line):
+                        clean_cfg_line = "HEIGHT " + str(height)
+                        
+                    if re.match("WINDOWED",clean_cfg_line):
+                        clean_cfg_line = "WINDOWED " + str(1 if values["fullscreen"] == 0 else 0)
+
+                    if re.match("VOICE_VOLUME",clean_cfg_line):
+                        clean_cfg_line = "VOICE_VOLUME " + str(values["sfx"])
+                        
+                    if re.match("MUSIC_VOLUME",clean_cfg_line):
+                        clean_cfg_line = "MUSIC_VOLUME " + str(f"{values["bgm"]:.3f}")
+                        
+                    
+                    settings.append(clean_cfg_line)
+                        
                 # prepare settings.cfg file
-                settings = ["WIDTH "+str(width),
-                        "HEIGHT "+str(height),
-                        "MAX_FPS "+str(values["fps"]),
-                        "WINDOWED "+str(1 if values["fullscreen"] == 0 else 0),
-                        "VOICE_VOLUME "+str(values["sfx"]),
-                        "MUSIC_VOLUME "+f"{values["bgm"]:.3f}",
-                        "SPECIAL_EFFECT_MODE_OTHER "+str(values["effects"]),
-                        "ALWAYS_VIEW_NAME "+str(values["names"]),
-                        "VIEW_CHAT "+str(values["chat"]),
-                        "SPECIAL_EFFECT_MODE_ITEM "+str(values["glow"]),
-                        "TARGET_RENDER "+str(values["model"]),
-                        "SOFTWARE_CURSOR "+str(1 if values["cursor"] == 0 else 0),
-                        "FIELD_OF_VIEW "+str(values["fov"]),
-                        "TRANSPARENT "+f"{values["transparency"]:.3f}",
-                        "SHADOW_LEVEL "+str(values["shadow"]),
-                        "SKYBOX_MODE "+str(values["skybox"]),
-                        "PET_SKILL_USE_INFO "+str(values["petskill"]),
-                        "DOG_MODE "+str(values["dogmode"]),
-                        "SHOW_MOBLEVEL "+str(values["moblvl"]),
-                        "SHOW_MOBAIFLAG "+str(values["agromob"]),
-                        "SHOW_DAMAGE "+str(values["damage"]),
-                        "SHOW_MULTIPLE_DAMAGE "+str(values["multidmg"]),
-                        "USE_DEFAULT_IME "+str(1 if values["ime"] == 0 else 0),
-                        "PICKUP_ALL_ONCE "+str(values["pickup"]),
-                        "VISIBILITY 3",
-                        "BPP 32",
-                        "GAMMA 3",
-                        "OBJECT_CULLING 1",
-                        "PRELOAD_MOTION 1 ",
-                        "DECOMPRESSED_TEXTURE 0 ",
-                        "SOFTWARE_TILING 0",
-                        "IS_SAVE_ID 0",
-                        "SAVE_ID 0",
-                        "FREQUENCY "+str(values["fps"])]
+#                settings = ["WIDTH "+str(width),
+#                        "HEIGHT "+str(height),
+#                        "BPP 32",
+#                        "FREQUENCY 60",
+#                        "SOFTWARE_CURSOR "+str(1 if values["cursor"] == 0 else 0),
+#                        "OBJECT_CULLING 1"
+#                        "WINDOWED "+str(1 if values["fullscreen"] == 0 else 0),
+#                        "VOICE_VOLUME "+str(values["sfx"]),
+#                        "MUSIC_VOLUME "+f"{values["bgm"]:.3f}",
+#                        "SPECIAL_EFFECT_MODE_OTHER "+str(values["effects"]),
+#                        "ALWAYS_VIEW_NAME "+str(values["names"]),
+#                        "VIEW_CHAT "+str(values["chat"]),
+#                        "SPECIAL_EFFECT_MODE_ITEM "+str(values["glow"]),
+#                        "TARGET_RENDER "+str(values["model"]),
+#                        "FIELD_OF_VIEW "+str(values["fov"]),
+#                        "TRANSPARENT "+f"{values["transparency"]:.3f}",
+#                        "SHADOW_LEVEL "+str(values["shadow"]),
+#                        "SKYBOX_MODE "+str(values["skybox"]),
+#                        "PET_SKILL_USE_INFO "+str(values["petskill"]),
+#                        "DOG_MODE "+str(values["dogmode"]),
+#                        "SHOW_MOBLEVEL "+str(values["moblvl"]),
+#                        "SHOW_MOBAIFLAG "+str(values["agromob"]),
+#                        "SHOW_DAMAGE "+str(values["damage"]),
+#                        "SHOW_MULTIPLE_DAMAGE "+str(values["multidmg"]),
+#                        "USE_DEFAULT_IME "+str(1 if values["ime"] == 0 else 0),
+#                        "PICKUP_ALL_ONCE "+str(values["pickup"]),
+#                        "VISIBILITY 3",
+#                        "GAMMA 3",
+#                        "OBJECT_CULLING 1",
+#                        "PRELOAD_MOTION 1 ",
+#                        "DECOMPRESSED_TEXTURE 0 ",
+#                        "SOFTWARE_TILING 0",
+#                        "IS_SAVE_ID 0",
+#                        "SAVE_ID 0",
+#                        "FREQUENCY "+str(values["fps"])]
                 return settings
 
             windows_to_start = []
@@ -821,7 +865,7 @@ class App(customtkinter.CTk):
                             ShowWindow(uphwnd, SW_HIDE)
                             uphwnds.append(uphwnd)
 
-                process = Popen([update_path])
+                process = Popen([update_path],cwd=path.join(directory, emtgenpath))
                 pidd = process.pid
                 p = Process(pidd)
                 while True:
@@ -839,9 +883,6 @@ class App(customtkinter.CTk):
                     write_new = io_counters_new[3]
                     if read == read_new and write == write_new:
                         kill(pidd,15)
-                        if path.exists(crash_path):
-                            remove(crash_path)
-                            sleep(1)
                         break
 
             key_lines = []
@@ -859,7 +900,7 @@ class App(customtkinter.CTk):
                 for key in key_lines:
                     file.write((key) + "\n")
             access_time_timestamp = path.getatime(config_path)
-            process = Popen([exe_path])
+            process = Popen([exe_path],cwd=path.join(directory, emtgenpath))
             if windows_to_start[0]["fullscreen"] == 0:
                 pids.append(process.pid)
 
@@ -875,7 +916,7 @@ class App(customtkinter.CTk):
                                 for key in key_lines:
                                     file.write((key) + "\n")
                             access_time_timestamp = path.getatime(config_path)
-                            process = Popen([exe_path])
+                            process = Popen([exe_path],cwd=path.join(directory, emtgenpath))
                             if window["fullscreen"] == 0:
                                 pids.append(process.pid)
                             break
@@ -907,7 +948,7 @@ class App(customtkinter.CTk):
 
         # start opening windows
         self.hide_all()
-        open_met = Thread(target=open_stellaria)
+        open_met = Thread(target=open_emtgen)
         open_met.start()
 
     # save / load json settings
