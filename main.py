@@ -1,4 +1,4 @@
-﻿# import dependencies
+# import dependencies
 import sys
 from os import path, kill, remove, listdir
 from win32api import EnumDisplayMonitors, GetMonitorInfo
