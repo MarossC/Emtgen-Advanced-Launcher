@@ -338,14 +338,14 @@ class App(customtkinter.CTk):
         self.velikost_label = customtkinter.CTkLabel(self.tabview.tab("Size"), text="Velikost", font=self.subtitle_font)
         self.velikost_label.grid(row=1, column=0, sticky="nw", padx=2, pady=2)
 
-        # Size of damage, size_damage
-        self.size_damage_label = customtkinter.CTkLabel(self.tabview.tab("Size"), text="Damage", font=self.label_font)
-        self.size_damage_label.grid(row=2, column=0, sticky="nw", padx=2, pady=2)
-        self.size_damage_number = customtkinter.IntVar(value=0)
-        self.size_damage_slider = customtkinter.CTkSlider(self.tabview.tab("Size"), from_=0.15, to=2.50, number_of_steps=235, command=self.set_size_damage)
-        self.size_damage_slider.grid(row=2, column=1, sticky="ew", padx=2, pady=2)
-        self.size_damage_number_label = customtkinter.CTkLabel(self.tabview.tab("Size"), textvariable=self.size_damage_number, font=self.label_font)
-        self.size_damage_number_label.grid(row=2, column=2, sticky="nw", padx=2, pady=2)
+#        # Size of damage, size_damage
+#        self.size_damage_label = customtkinter.CTkLabel(self.tabview.tab("Size"), text="Damage", font=self.label_font)
+#        self.size_damage_label.grid(row=2, column=0, sticky="nw", padx=2, pady=2)
+#        self.size_damage_number = customtkinter.IntVar(value=0)
+#        self.size_damage_slider = customtkinter.CTkSlider(self.tabview.tab("Size"), from_=0.15, to=2.50, number_of_steps=235, command=self.set_size_damage)
+#        self.size_damage_slider.grid(row=2, column=1, sticky="ew", padx=2, pady=2)
+#        self.size_damage_number_label = customtkinter.CTkLabel(self.tabview.tab("Size"), textvariable=self.size_damage_number, font=self.label_font)
+#        self.size_damage_number_label.grid(row=2, column=2, sticky="nw", padx=2, pady=2)
 
         # Size of boss, size_boss
         self.size_boss_label = customtkinter.CTkLabel(self.tabview.tab("Size"), text="Boss", font=self.label_font)
@@ -497,8 +497,8 @@ class App(customtkinter.CTk):
         self.view_mob_number.set(values["view_mob"])
         self.view_buff_slider.set(values["view_buff"])
         self.view_buff_number.set(values["view_buff"])
-        self.size_damage_slider.set(values["size_damage"])
-        self.size_damage_number.set(values["size_damage"])
+#        self.size_damage_slider.set(values["size_damage"])
+#        self.size_damage_number.set(values["size_damage"])
         self.size_boss_slider.set(values["size_boss"])
         self.size_boss_number.set(values["size_boss"])
         self.size_stone_slider.set(values["size_stone"])
@@ -531,7 +531,7 @@ class App(customtkinter.CTk):
                   "view_mount": self.view_mount_number.get(),
                   "view_mob": self.view_mob_number.get(),
                   "view_buff": self.view_buff_number.get(),
-                  "size_damage": self.size_damage_number.get(),
+#                  "size_damage": self.size_damage_number.get(),
                   "size_boss": self.size_boss_number.get(),
                   "size_stone": self.size_stone_number.get(),
                   "size_mount": self.size_mount_number.get(),
@@ -750,8 +750,8 @@ class App(customtkinter.CTk):
         self.view_mob_number.set(round(val,3))
     def set_view_buff(self, val):
         self.view_buff_number.set(round(val,3))
-    def set_size_damage(self, val):
-        self.size_damage_number.set(round(val,3))
+#    def set_size_damage(self, val):
+#        self.size_damage_number.set(round(val,3))
     def set_size_boss(self, val):
         self.size_boss_number.set(round(val,3))
     def set_size_stone(self, val):
@@ -908,8 +908,8 @@ class App(customtkinter.CTk):
                     if re.match("PLAYER_RANGE", clean_cfg_line):
                         clean_cfg_line = "PLAYER_RANGE " + str(values["view_buff"])
                     ###### Size
-                    if re.match("DAMAGE_SCALE", clean_cfg_line):
-                        clean_cfg_line = "DAMAGE_SCALE " + str(f"{values["size_damage"]:.4f}")
+#                    if re.match("DAMAGE_SCALE", clean_cfg_line):
+#                        clean_cfg_line = "DAMAGE_SCALE " + str(f"{values["size_damage"]:.4f}")
                     if re.match("BOSS_SCALE", clean_cfg_line):
                         clean_cfg_line = "BOSS_SCALE " + str(f"{values["size_boss"]:.3f}")
                     if re.match("MOUNT_SCALE", clean_cfg_line):
@@ -1093,6 +1093,7 @@ class App(customtkinter.CTk):
 if __name__ == "__main__":
     app = App()
     app.mainloop()
+
 
 
 
